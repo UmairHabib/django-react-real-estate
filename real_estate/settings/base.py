@@ -1,5 +1,6 @@
 import environ
 from pathlib import Path
+from datetime import timedelta
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -20,7 +21,44 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(" ")
 AUTH_USER_MODEL = "users.User"
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
 
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": (
+        "Bearer",
+        "JWT"
+    ),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "SIGNING_KEY": env("SIGNING_KEY"),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken"),
+}
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "SEND_CONFIRMATION_EMAIL": True,
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "SET_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "USERNAME_RESET_CONFIRM_URL": "email/reset/confirm/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "SERIALIZERS": {
+        "user_create": "apps.users.serializers.CreateUserSerializer",
+        "user": "apps.users.serializers.UserSerializer",
+        "current_user": "apps.user.serializers.UserSerializer",
+        "user_delete": "djoser.serializers.UserSerializer",
+    }
+}
 # Application definition
 
 DJANGO_APPS = [
@@ -40,6 +78,8 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "django_countries",
     "phonenumber_field",
+    "djoser",
+    "rest_framework_simplejwt",
 ]
 
 LOCAL_APPS = ["apps.common", "apps.users", "apps.profiles", "apps.ratings"]
@@ -161,8 +201,8 @@ logging.config.dictConfig({
         "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
     },
 
-    "loggers":{
-        "": {"level": "INFO", "handlers":["console", "file"], "propagate":False},
+    "loggers": {
+        "": {"level": "INFO", "handlers": ["console", "file"], "propagate":False},
         "apps": {
             "level": "INFO",
             "handlers": ["console"],
