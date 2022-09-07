@@ -1,5 +1,6 @@
-from .models import Enquiry
 from django.contrib import admin
+
+from .models import Enquiry
 
 
 class EnquiryAdmin(admin.ModelAdmin):
@@ -7,4 +8,3 @@ class EnquiryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Enquiry, EnquiryAdmin)
-
